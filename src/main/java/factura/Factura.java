@@ -1,8 +1,11 @@
 package factura;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List; import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 class Facturaobj{
     String descripcion;
@@ -73,11 +76,12 @@ class FacturaUtils {
 }
 
 public class Factura {
-    public static void main(String[] args) {
-        Facturaobj f=new Facturaobj("ordenador",1000 , new Date() , "A55B" , 1);
-        Facturaobj f2=new Facturaobj("movil",300, new Date() , "C30C" , 2);
-        Facturaobj f3=new Facturaobj("impresora",200, new Date() , "L22T" , 3);
-        Facturaobj f4=new Facturaobj("imac",1500, new Date() , "M24F" , 4);
+    public static void main(String[] args) throws ParseException {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        Facturaobj f=new Facturaobj("ordenador",1000 , formatter.parse("2020-12-01") , "A55B" , 1);
+        Facturaobj f2=new Facturaobj("movil",300, formatter.parse("2020-12-02") , "C30C" , 2);
+        Facturaobj f3=new Facturaobj("impresora",200, formatter.parse("2020-12-03") , "L22T" , 3);
+        Facturaobj f4=new Facturaobj("imac",1500, formatter.parse("2020-12-04") , "M24F" , 4);
 
 
         List<Facturaobj> lista= new ArrayList<Facturaobj>();
@@ -87,28 +91,18 @@ public class Factura {
         lista.add(f3);
         lista.add(f4);
 
-        /*Predicate<Facturaobj> predicado = new Predicate<Facturaobj>() {
-            @Override
-            public boolean test(Facturaobj t) {
-                //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-                System.out.println("iteracion ");
-                return t.getImporte()>300;//hacer comparativas
-            }//busca x importe en la lista especifica y acrea importe mayo a 300 trae primero
-        };*/
-        //crea funcion de tipo objeto que maneja atributo haces test y filtras co n valor espe interar dentro de lista especifica
+        Facturaobj fact1 = lista.stream().filter(FacturaUtils.filtroCodFact("M24F")).findFirst().get();
+        System.out.println("la factura con el codigo especifico es: "+fact1.getCodFactura());
 
-        /*Facturaobj facturaFiltro= lista.stream()
-                .filter(predicado).findFirst().get();
-        System.out.println("FACTURA UNICA "+facturaFiltro.getImporte());
-        //trae primero , obtiene en la variable , filtrando x el predicado
+        Stream<Facturaobj> fact2 = lista.stream().filter(FacturaUtils.filtroCantidad(2, ">"));
+            fact2.forEach((Facturaobj facturaMostrar) -> {
+                System.out.println("Codigo de factura " +facturaMostrar.getCodFactura() +" Y su cantidad es: "+facturaMostrar.getCantidad());
+            });
 
-        /*
-        Factura facturaFiltro=lista.stream()
-                .filter(elemento->elemento.getImporte()>300)
-                .findFirst()
-                .get();
-        System.out.println(facturaFiltro.getImporte());
-        */
+        Stream<Facturaobj> fact3 = lista.stream().filter(FacturaUtils.filtroFecha(formatter.parse("2020-12-01"), ">" ));
+        fact3.forEach((Facturaobj factura3Mostrar) -> {
+            System.out.println("Codigo de factura " +factura3Mostrar.getCodFactura() +" Y su fecha es: "+factura3Mostrar.getFecha());
+        });
     }
 }
-// date (hacer los otros 4)
+
